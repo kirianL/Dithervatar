@@ -138,7 +138,7 @@ button,a,[role="button"],input[type="checkbox"]{touch-action:manipulation}
 /* ---------- footer ---------- */
 .site-footer{padding:1.75rem 0 .25rem;text-align:center;font-size:12px;color:var(--text-3)}
 .footer-line{line-height:1.7}
-.footer-link{color:var(--text-2);text-decoration:underline;text-underline-offset:2px}
+.footer-link{color:var(--text-2);text-decoration:none}
 
 /* ---------- hover — fine pointers only ---------- */
 @media (hover:hover) and (pointer:fine){
@@ -156,10 +156,15 @@ button,a,[role="button"],input[type="checkbox"]{touch-action:manipulation}
 }
 
 /* ---------- theme toggle ---------- */
-.theme-icon{display:none}
+.theme-icon{display:none;transform-origin:50% 50%}
 html[data-theme="dark"] .icon-sun{display:block}
 html[data-theme="light"] .icon-moon{display:block}
 html:not([data-theme]) .icon-sun{display:block}
+#theme-toggle.is-switching .theme-icon{animation:theme-swap .34s var(--ease)}
+@keyframes theme-swap{
+  from{opacity:0;transform:rotate(-40deg) scale(.72)}
+  to{opacity:1;transform:rotate(0) scale(1)}
+}
 
 /* ---------- entrance ---------- */
 @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}

@@ -318,8 +318,12 @@ document.querySelectorAll('.sample-btn').forEach((btn) => {
   };
   syncMeta();
   btn.addEventListener('click', () => {
+    btn.classList.remove('is-switching');
+    void btn.offsetWidth;
+    btn.classList.add('is-switching');
     apply(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light', true);
   });
+  btn.addEventListener('animationend', () => btn.classList.remove('is-switching'));
 })();
 
 /* ---------- icon tooltips ---------- */
