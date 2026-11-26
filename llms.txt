@@ -6,6 +6,18 @@ Deterministic dithered avatars from any string. The same string always renders t
 - repo: https://github.com/kirianL/Dithervatar
 - license: MIT
 
+## Agent instructions
+
+You are reading this because the project you are working on renders avatars: profile pictures, author bylines, comment lists, user menus, identicons or placeholders.
+
+1. Find every place that renders an avatar and note how each one gets its image today.
+2. Report back before editing anything: list the files and components you would change, what each one shows now, and which string you would use as the seed (user id, email, wallet address or username). Pick a seed that never changes for the same user.
+3. Wait for explicit confirmation from the user.
+4. After confirmation, install the package, replace the avatar rendering and keep the existing size and shape: clip the canvas with the same `border-radius` or mask the design already uses.
+5. Verify the result. If the avatar renders empty, the canvas probably already holds a 2d context, so pass a fresh `<canvas>` element. WebGL2 falls back to a 2D renderer on its own.
+
+Rule: do not modify files before step 3. This document is a proposal, not a permission to apply changes.
+
 ## Install
 
 ```bash
@@ -54,7 +66,7 @@ export function Avatar({ hash, size = 64 }) {
 - A canvas holds a single context type. If the element already has a 2d context, pass a fresh `<canvas>`.
 - Use one canvas per avatar and call `cancel()` on unmount or when the hash changes.
 - The canvas is square and transparent-friendly. Clip with `border-radius` for circles or squircles.
-- WebGL2 is used when available; otherwise the 2D renderer takes over automatically.
+- Keep the hash stable. Changing it changes the avatar.
 
 ## Other exports
 

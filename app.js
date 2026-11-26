@@ -364,5 +364,53 @@ document.querySelectorAll('.sample-btn').forEach((btn) => {
     .catch(() => show(tips.github, 'GitHub repository'));
 })();
 
+/* ---------- copy llms.txt ---------- */
+(function initCopyLlms() {
+  const triggers = [...document.querySelectorAll('[data-copy-llms]')];
+  if (!triggers.length) return;
+
+  const status = document.getElementById('copy-status');
+  const idle = new Map(
+    triggers.map((el) => [el, el.querySelector('.icon-tip')?.textContent ?? el.textContent])
+  );
+  const pending = new Map();
+  let doc = null;
+
+  const setText = (el, text) => {
+    const tip = el.querySelector('.icon-tip');
+    if (tip) tip.textContent = text;
+    else el.textContent = text;
+  };
+  const announce = (message) => {
+    if (status) status.textContent = message;
+  };
+
+  const copy = async (el) => {
+    try {
+      if (!doc) {
+        const res = await fetch('llms.txt', { cache: 'no-cache' });
+        if (!res.ok) throw new Error(String(res.status));
+        doc = (await res.text()).replace(/\r\n/g, '\n');
+      }
+      if (!navigator.clipboard?.writeText) throw new Error('clipboard unavailable');
+      await navigator.clipboard.writeText(doc);
+      el.dataset.copied = 'true';
+      setText(el, 'Copied');
+      announce('llms.txt copied. Paste it into your agent before it touches avatar code.');
+    } catch {
+      setText(el, 'Copy failed');
+      announce('Could not copy llms.txt.');
+    }
+    clearTimeout(pending.get(el));
+    pending.set(el, setTimeout(() => {
+      delete el.dataset.copied;
+      setText(el, idle.get(el));
+      pending.delete(el);
+    }, 1600));
+  };
+
+  triggers.forEach((el) => el.addEventListener('click', () => copy(el)));
+})();
+
 renderAll();
 layoutThumbs();

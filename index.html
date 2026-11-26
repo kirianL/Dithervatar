@@ -31,10 +31,10 @@
   <header class="topbar">
     <a class="brand" href="/" aria-label="Home"><span class="brand-word" id="logo">Dithervatar</span></a>
     <nav class="toplinks" aria-label="Links">
-      <a href="llms.txt" target="_blank" rel="noopener noreferrer" aria-label="llms.txt" class="icon-link">
+      <button type="button" aria-label="Copy llms.txt instructions for agents" class="icon-link" data-copy-llms>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.2l2.2 6.1 6.1 2.2-6.1 2.2L12 18.8l-2.2-6.1L3.7 10.5l6.1-2.2z" fill="currentColor"/></svg>
-        <span class="icon-tip" aria-hidden="true">llms.txt</span>
-      </a>
+        <span class="icon-tip" aria-hidden="true">Copy llms.txt</span>
+      </button>
       <a href="https://github.com/kirianL/Dithervatar" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="icon-link">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 1.5C5.923 1.5 1 6.31814 1 12.2657C1 17.029 4.149 21.0534 8.521 22.4794C9.071 22.5734 9.277 22.2514 9.277 21.9685C9.277 21.7121 9.264 20.8645 9.264 19.9632C6.5 20.4613 5.785 19.3035 5.565 18.6987C5.441 18.3884 4.905 17.4332 4.438 17.1778C4.053 16.9752 3.502 16.478 4.424 16.4643C5.29 16.4506 5.909 17.2443 6.115 17.5683C7.105 19.1959 8.686 18.7388 9.319 18.456C9.415 17.7562 9.704 17.2854 10.02 17.0163C7.572 16.7472 5.015 15.8184 5.015 11.7C5.015 10.5295 5.441 9.56057 6.143 8.80697C6.032 8.53783 5.647 7.43483 6.253 5.95406C6.253 5.95406 7.174 5.6722 9.277 7.05803C10.1725 6.81488 11.0977 6.69271 12.027 6.69494C12.963 6.69494 13.898 6.81532 14.777 7.05803C16.881 5.65849 17.802 5.95406 17.802 5.95406C18.407 7.43483 18.023 8.53783 17.913 8.80697C18.614 9.56057 19.04 10.5168 19.04 11.7C19.04 15.8321 16.469 16.7472 14.021 17.0163C14.42 17.353 14.764 17.9989 14.764 19.008C14.764 20.4476 14.75 21.6054 14.75 21.9685C14.75 22.2514 14.956 22.5871 15.506 22.4794C19.851 21.0534 23 17.0163 23 12.2657C23 6.31814 18.078 1.5 12 1.5Z" fill="currentColor"/></svg>
         <span class="icon-tip" data-stat="github" aria-hidden="true"></span>
@@ -157,9 +157,11 @@ renderDithervatar(canvas, {
     <p class="docs-links">
       <a class="footer-link" href="https://www.npmjs.com/package/dithervatar" target="_blank" rel="noopener noreferrer">Full reference on npm</a>
       <span aria-hidden="true">·</span>
-      <a class="footer-link" href="llms.txt" target="_blank" rel="noopener noreferrer">llms.txt for agents</a>
+      <button type="button" class="docs-copy" data-copy-llms>Copy llms.txt for agents</button>
     </p>
   </section>
+
+  <p class="sr-only" role="status" aria-live="polite" id="copy-status"></p>
 
   <footer class="site-footer">
     <p class="footer-line">© 2026 Dithervatar</p>
