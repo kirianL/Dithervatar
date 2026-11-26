@@ -219,7 +219,14 @@ function getDevicePixelRatio() {
   if (typeof window === "undefined" || !window.devicePixelRatio) return 1;
   return Math.min(window.devicePixelRatio, 3);
 }
+function prefersReducedMotion() {
+  return typeof window !== 'undefined'
+    && typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 function renderGradient(canvas, { size, colors, animated = false, seeds }) {
+  const still = !animated || prefersReducedMotion();
   if (colors.length < 4) return null;
   const dpr = getDevicePixelRatio();
   canvas.width = size * dpr;
@@ -259,7 +266,7 @@ function renderGradient(canvas, { size, colors, animated = false, seeds }) {
   const PHASE_SPEED = 1.2;
   const w = size + pad * 2;
   const h = size + pad * 2;
-  const animResScale = !useFilter && animated ? 0.5 : 1;
+  const animResScale = !useFilter && !still ? 0.5 : 1;
   const offCanvas = document.createElement("canvas");
   offCanvas.width = w * dpr * animResScale;
   offCanvas.height = h * dpr * animResScale;
@@ -299,7 +306,7 @@ function renderGradient(canvas, { size, colors, animated = false, seeds }) {
     ctx.globalCompositeOperation = "source-over";
     ctx.globalAlpha = 1;
   };
-  if (!animated) {
+  if (still) {
     draw(0);
     return null;
   }
@@ -338,6 +345,7 @@ function getDevicePixelRatio2() {
   return Math.min(window.devicePixelRatio, 3);
 }
 function renderDither(canvas, { size, colors, dotScale: dotScaleOpt, animated = false, seeds }) {
+  const still = !animated || prefersReducedMotion();
   const dpr = getDevicePixelRatio2();
   const sizePx = Math.round(size * dpr);
   canvas.width = sizePx;
@@ -399,7 +407,7 @@ function renderDither(canvas, { size, colors, dotScale: dotScaleOpt, animated = 
     }
     ctx.putImageData(img, 0, 0);
   };
-  if (!animated) {
+  if (still) {
     draw(0);
     return null;
   }

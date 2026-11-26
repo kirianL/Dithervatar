@@ -1,3 +1,5 @@
+import { CR_MAP_COUNTRIES } from './cr-map.js';
+import { avatarToSvg } from './vendor/svg.js';
 import {
   hashToColors,
   hashToSeeds,
@@ -82,13 +84,13 @@ function layoutThumbs() {
   });
 }
 
-function bindToggleGroup(el, set) {
+function bindToggleGroup(el, set, after = renderAll) {
   el.querySelectorAll('.seg-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       set(btn.dataset.value);
       el.querySelectorAll('.seg-btn').forEach((b) => b.classList.toggle('active', b === btn));
       layoutThumbs();
-      renderAll();
+      after();
     });
   });
 }
@@ -135,7 +137,7 @@ function canvasFor(slot, kind) {
   const c = document.createElement('canvas');
   c.className = slot.canvas.className;
   if (slot.canvas.id) c.id = slot.canvas.id;
-  slot.canvas.replaceWith(c);
+  if (slot.canvas.parentNode) slot.canvas.replaceWith(c);
   slot.canvas = c;
   slot.kind = kind;
   return c;
@@ -239,6 +241,12 @@ function renderColors() {
 }
 
 /* ---------- export ---------- */
+const exportSlot = { canvas: document.createElement('canvas'), kind: null };
+function staticFrame(hash, size) {
+  renderAvatar(exportSlot, hash, size, { ...state, animated: false });
+  return exportSlot.canvas;
+}
+
 const downloadLabel = slotText($('#download-label'), 'Download PNG', { stagger: 22, duration: 260 });
 const downloadButton = $('#btn-download');
 const lockDownloadWidth = () => {
@@ -247,9 +255,42 @@ const lockDownloadWidth = () => {
 lockDownloadWidth();
 if (document.fonts?.ready) document.fonts.ready.then(lockDownloadWidth);
 
+state.format = 'png';
+bindToggleGroup($('#group-format'), (v) => {
+  state.format = v;
+  downloadLabel.set(v === 'svg' ? 'Download SVG' : 'Download PNG');
+}, () => {});
+
+const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+const motionNote = $('#motion-note');
+function syncMotionNote() {
+  if (motionNote) motionNote.hidden = !motionQuery.matches;
+}
+motionQuery.addEventListener?.('change', () => { syncMotionNote(); renderAll(); });
+syncMotionNote();
+
 $('#btn-download').addEventListener('click', () => {
   const size = state.exportSize;
-  const src = previewSlot.canvas;
+  const hash = state.hashInput || 'default';
+  if (state.format === 'svg') {
+    const svg = avatarToSvg(staticFrame(hash, Math.max(512, size)), {
+      hash,
+      tones: state.tones.length ? state.tones : undefined,
+      size,
+      shape: state.shape,
+      grid: 64,
+    });
+    if (!svg) return;
+    const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+    const a = document.createElement('a');
+    a.download = 'dithervatar.svg';
+    a.href = url;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+    downloadLabel.flash('Saved', { revertAfter: 1200, enter: { direction: 'up' } });
+    return;
+  }
+  const src = staticFrame(hash, size);
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
@@ -424,3 +465,90 @@ document.querySelectorAll('.sample-btn').forEach((btn) => {
 
 renderAll();
 layoutThumbs();
+
+/* ---------- Costa Rica pencil-circle + map note ---------- */
+(function initCostaRicaNote() {
+  const word = document.querySelector('.bio-pencil-word');
+  const svg = word?.querySelector('.cr-map-svg');
+  const note = word?.querySelector('.bio-hand-note');
+  const dimmer = document.querySelector('.cr-dimmer');
+  if (!word || !svg || !note) return;
+
+  const ns = 'http://www.w3.org/2000/svg';
+  const frag = document.createDocumentFragment();
+  for (const { cls, d } of CR_MAP_COUNTRIES) {
+    const p = document.createElementNS(ns, 'path');
+    p.setAttribute('class', cls);
+    p.setAttribute('d', d);
+    frag.appendChild(p);
+  }
+  svg.appendChild(frag);
+
+  let leaveTimer = null;
+  const positionNote = (clientX) => {
+    const wordRect = word.getBoundingClientRect();
+    const noteWidth = note.offsetWidth;
+    const vw = document.documentElement.clientWidth;
+    const anchorX = clientX !== undefined ? clientX : wordRect.left + wordRect.width / 2;
+    const left = Math.min(Math.max(12, anchorX - noteWidth / 2), vw - noteWidth - 12);
+    note.style.left = `${left - wordRect.left}px`;
+    note.style.transform = 'none';
+  };
+
+  const activate = () => {
+    if (leaveTimer) { clearTimeout(leaveTimer); leaveTimer = null; }
+    positionNote();
+    word.classList.remove('is-leaving');
+    word.classList.add('is-active');
+    document.body.classList.add('is-cr-dimmed');
+    word.setAttribute('aria-expanded', 'true');
+    note.setAttribute('aria-hidden', 'false');
+  };
+
+  const deactivate = () => {
+    if (!word.classList.contains('is-active')) return;
+    word.classList.remove('is-active');
+    document.body.classList.remove('is-cr-dimmed');
+    word.setAttribute('aria-expanded', 'false');
+    note.setAttribute('aria-hidden', 'true');
+    word.classList.add('is-leaving');
+    leaveTimer = setTimeout(() => {
+      word.classList.remove('is-leaving');
+      leaveTimer = null;
+    }, 640);
+  };
+
+  word.addEventListener('pointerenter', (e) => {
+    if (e.pointerType === 'touch') return;
+    positionNote(e.clientX);
+    activate();
+  });
+  word.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'touch' && word.classList.contains('is-active')) {
+      positionNote(e.clientX);
+    }
+  });
+  word.addEventListener('pointerleave', (e) => {
+    if (e.pointerType !== 'touch') deactivate();
+  });
+  word.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (word.classList.contains('is-active')) deactivate();
+    else activate();
+  });
+  dimmer?.addEventListener('click', () => {
+    deactivate();
+    word.blur();
+  });
+  window.addEventListener('scroll', deactivate, { passive: true });
+  window.addEventListener('resize', () => {
+    if (word.classList.contains('is-active')) positionNote();
+  });
+  word.addEventListener('focus', () => {
+    if (word.matches(':focus-visible')) activate();
+  });
+  word.addEventListener('blur', deactivate);
+  word.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') deactivate();
+  });
+})();

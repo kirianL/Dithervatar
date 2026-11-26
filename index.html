@@ -74,11 +74,12 @@
         </div>
         <div class="field-group">
           <label class="field-label">Animated</label>
-          <div class="seg" id="group-animated">
+          <div class="seg" id="group-animated" aria-describedby="motion-note">
             <span class="seg-thumb" aria-hidden="true"></span>
             <button type="button" class="seg-btn active" data-value="off">off</button>
             <button type="button" class="seg-btn" data-value="on">on</button>
           </div>
+          <p class="field-note" id="motion-note" hidden>Reduced motion is on in your system settings, so avatars render a still frame.</p>
         </div>
         <div class="field-group field-grow">
           <label class="field-label" for="hash-input">Type anything</label>
@@ -92,6 +93,11 @@
       <div class="controls-row">
         <div class="colors" id="color-grid" aria-label="Generated colors"></div>
         <div class="export">
+          <div class="seg seg-compact" id="group-format" role="group" aria-label="Export format">
+            <span class="seg-thumb" aria-hidden="true"></span>
+            <button type="button" class="seg-btn active" data-value="png">png</button>
+            <button type="button" class="seg-btn" data-value="svg">svg</button>
+          </div>
           <select aria-label="Export size in pixels" class="field field-select" id="export-size">
             <option value="32">32×32</option>
             <option value="64">64×64</option>
@@ -165,10 +171,11 @@ renderDithervatar(canvas, {
 
   <footer class="site-footer">
     <p class="footer-line">© 2026 Dithervatar</p>
-    <p class="footer-line">Made by <a href="https://kirian.dev" target="_blank" rel="noopener noreferrer" class="footer-link">Kirian Luna</a> in Costa Rica</p>
+    <p class="footer-line">Made by <a href="https://kirian.dev" target="_blank" rel="noopener noreferrer" class="footer-link">Kirian Luna</a> in <span class="bio-pencil-word" role="button" tabindex="0" data-mark="circle" aria-expanded="false">Costa Rica<svg class="bio-mark bio-mark--circle" viewBox="0 0 100 40" preserveAspectRatio="none" fill="none" aria-hidden="true"><path pathLength="1" d="M76 5C56 1 22 2 8 12C-3 20 3 30 20 35C39 40 71 37 87 32C101 27 101 17 91 10C83 4 67 1 57 3Z"/></svg><span class="bio-hand-note bio-hand-note--costa-rica" role="tooltip" aria-hidden="true"><span class="cr-map-kicker">10°N, 84°W</span><span class="cr-map-frame"><svg class="cr-map-svg" viewBox="0 0 720 460" aria-hidden="true"></svg></span><span class="cr-map-caption">Between Nicaragua and Panama, Pacific to Caribbean</span></span></span></p>
     <p class="footer-line"><a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer" class="footer-link">MIT License</a></p>
   </footer>
 </div>
+<div class="cr-dimmer" aria-hidden="true"></div>
 <script type="module" src="app.js"></script>
 </body>
 </html>

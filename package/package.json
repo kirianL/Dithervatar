@@ -1,14 +1,20 @@
 {
   "name": "dithervatar",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Deterministic dithered avatars from any string. WebGL2 Bayer halftone renderer, automatic 2D fallback, zero dependencies.",
   "type": "module",
   "main": "./src/index.js",
+  "bin": {
+    "dithervatar": "./bin/dithervatar.js"
+  },
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.js",
+    "./element": "./src/element.js",
+    "./react": "./src/react.js"
   },
   "files": [
     "src",
+    "bin",
     "README.md",
     "LICENSE"
   ],

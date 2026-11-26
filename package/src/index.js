@@ -3,6 +3,7 @@ import { hasWebGL2, renderDitherGL } from './dither-gl.js';
 
 export { hashToColors, hashToSeeds, oklchToCss, oklchToHex, parseTone } from './core.js';
 export { hasWebGL2, renderDitherGL } from './dither-gl.js';
+export { avatarToSvg } from './svg.js';
 
 export function renderDithervatar(canvas, { hash, size = 64, animated = false, tones } = {}) {
   const h = hash == null ? '' : String(hash);
