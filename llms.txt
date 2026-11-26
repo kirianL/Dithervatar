@@ -1,0 +1,61 @@
+# Dithervatar
+
+Deterministic dithered avatars from any string. The same string always renders the same avatar. WebGL2 Bayer halftone with a 2D canvas fallback, zero runtime dependencies, ESM only.
+
+- npm: https://www.npmjs.com/package/dithervatar
+- repo: https://github.com/kirianL/Dithervatar
+- license: MIT
+
+## Install
+
+```bash
+npm install dithervatar
+```
+
+## Usage
+
+```js
+import { renderDithervatar } from 'dithervatar';
+
+const canvas = document.querySelector('#avatar');
+const cancel = renderDithervatar(canvas, {
+  hash: '0x742d35cc6634c0532925a3b844bc454e4438f44e',
+  size: 128,
+  animated: false,
+});
+```
+
+`renderDithervatar(canvas, options)` draws into the given `<canvas>` and returns a `cancel()` function that stops the animation loop.
+
+## Options
+
+| Option | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `hash` | `string` | `''` | Seed for colors, field offset and dither seeds. |
+| `size` | `number` | `64` | Square canvas size in CSS pixels. |
+| `animated` | `boolean` | `false` | Runs the dither loop with `requestAnimationFrame`. |
+| `tones` | `string[]` | — | Palette override as hex, `oklch()` or CSS color names. |
+
+## React
+
+```jsx
+import { useEffect, useRef } from 'react';
+import { renderDithervatar } from 'dithervatar';
+
+export function Avatar({ hash, size = 64 }) {
+  const ref = useRef(null);
+  useEffect(() => renderDithervatar(ref.current, { hash, size }), [hash, size]);
+  return <canvas ref={ref} width={size} height={size} />;
+}
+```
+
+## Constraints
+
+- A canvas holds a single context type. If the element already has a 2d context, pass a fresh `<canvas>`.
+- Use one canvas per avatar and call `cancel()` on unmount or when the hash changes.
+- The canvas is square and transparent-friendly. Clip with `border-radius` for circles or squircles.
+- WebGL2 is used when available; otherwise the 2D renderer takes over automatically.
+
+## Other exports
+
+`hashToColors`, `hashToSeeds`, `oklchToHex`, `oklchToCss`, `parseTone`, `hasWebGL2`, `renderDitherGL`, `renderDithervatarTo`.
