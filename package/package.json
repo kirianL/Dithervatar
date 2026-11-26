@@ -1,0 +1,34 @@
+{
+  "name": "dithervatar",
+  "version": "0.1.0",
+  "description": "Deterministic dithered avatars from any string. WebGL2 Bayer halftone renderer, automatic 2D fallback, zero dependencies.",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kirianL/Dithervatar.git"
+  },
+  "homepage": "https://kirian.dev",
+  "keywords": [
+    "avatar",
+    "dither",
+    "halftone",
+    "bayer",
+    "webgl2",
+    "deterministic",
+    "identicon",
+    "vanilla-js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,201 @@
+:root{
+  --canvas:#0a0a0a;
+  --surface:#121214;
+  --surface-2:#1c1c1f;
+  --text:#f5f5f5;
+  --text-2:#a1a1aa;
+  --text-3:#71717a;
+  --serif:#d1c5ad;
+  --border:rgba(255,255,255,.08);
+  --border-2:rgba(255,255,255,.18);
+  --accent:#10b981;
+  --display:#eee;
+  --btn-solid:#ebebeb;--btn-solid-text:#0a0a0a;--btn-solid-hover:#fff;--btn-solid-hover-shadow:0 4px 14px rgba(255,255,255,.14);
+  --btn-ghost-bg:#141414;--btn-ghost-text:#a3a3a3;--btn-ghost-hover-bg:#1c1c1f;--btn-ghost-hover-text:#f5f5f5;--btn-ghost-hover-border:rgba(255,255,255,.18);--btn-ghost-hover-shadow:0 4px 14px rgba(0,0,0,.4);
+  --ease:cubic-bezier(.22,1,.36,1);
+  color-scheme:dark;
+}
+html[data-theme="light"]{
+  --canvas:#f4f3ef;
+  --surface:#ffffff;
+  --surface-2:#ecebe6;
+  --text:#1b1b1f;
+  --text-2:#52525b;
+  --text-3:#8b8b93;
+  --serif:#8a7a58;
+  --border:rgba(0,0,0,.08);
+  --border-2:rgba(0,0,0,.16);
+  --display:#1b1b1f;
+  --btn-solid:#1b1b1f;--btn-solid-text:#f4f3ef;--btn-solid-hover:#000;--btn-solid-hover-shadow:0 4px 14px rgba(0,0,0,.18);
+  --btn-ghost-bg:#ffffff;--btn-ghost-text:#52525b;--btn-ghost-hover-bg:#ecebe6;--btn-ghost-hover-text:#1b1b1f;--btn-ghost-hover-border:rgba(0,0,0,.16);--btn-ghost-hover-shadow:0 4px 14px rgba(0,0,0,.08);
+  color-scheme:light;
+}
+html.no-anim *{transition:none!important}
+*{box-sizing:border-box;margin:0;padding:0}
+html{
+  font-family:Inter,"Inter Fallback",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:15px;font-weight:450;line-height:1.45;letter-spacing:.01em;color:var(--text);
+  -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;
+  -webkit-tap-highlight-color:transparent;overscroll-behavior:none;
+}
+body{background:var(--canvas);min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,select{font:inherit;color:inherit}
+svg{display:block}
+button,a,[role="button"],input[type="checkbox"]{touch-action:manipulation}
+.seg-btn,.sample-btn,.icon-link,.copyable{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+
+.page{max-width:720px;margin:0 auto;padding:1.25rem 1.5rem 1.5rem;display:flex;flex-direction:column;min-height:100dvh}
+
+/* ---------- topbar ---------- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.25rem 0 1.5rem}
+.brand{display:inline-flex;align-items:center}
+.brand-word{font-family:Inter,sans-serif;font-size:14px;font-weight:500;line-height:18px;letter-spacing:-.01em;color:var(--text)}
+.brand-word span{display:inline-block;cursor:pointer;padding:.2rem 0}
+.toplinks{display:flex;align-items:center;gap:.25rem}
+.icon-link{display:flex;align-items:center;gap:.3rem;padding:.4rem .55rem;border-radius:9px;color:var(--text-3);transition:color .2s var(--ease),background-color .2s var(--ease)}
+.stat{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--text-3);font-variant-numeric:tabular-nums}
+
+/* ---------- stage ---------- */
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:1rem}
+.avatar-wrap{display:flex;justify-content:center}
+.avatar-frame{width:min(280px,66vw);aspect-ratio:1;border-radius:9999px;overflow:hidden}
+.avatar-frame.shape-squircle{border-radius:0;clip-path:inset(0 round 28%)}
+.avatar-frame.shape-square{border-radius:0}
+.avatar-frame canvas{display:block;width:100%;height:100%}
+.display{font-family:"Geist Pixel",ui-monospace,monospace;font-size:48px;font-weight:400;line-height:48px;letter-spacing:0;color:var(--display);margin-top:2rem}
+.tagline{font-size:15px;font-weight:450;line-height:23px;letter-spacing:.16px;color:var(--text-2);max-width:44ch;margin-top:.6rem}
+
+/* ---------- playground (open layout) ---------- */
+.playground{width:100%;max-width:640px;margin-top:3rem;display:flex;flex-direction:column;gap:2.25rem}
+.controls-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:1.5rem 2.5rem}
+.field-group{display:flex;flex-direction:column;gap:.55rem;min-width:0}
+.field-group:not(.field-grow){align-items:center;text-align:center}
+.field-grow{flex:1 1 100%;max-width:460px}
+.field-label{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--text-3)}
+.field{height:40px;width:100%;border-radius:10px;border:1px solid var(--border);background:var(--surface);padding:0 .9rem;font-size:14px;font-weight:450;color:var(--text);outline:none;transition:border-color .2s var(--ease),box-shadow .2s var(--ease)}
+.field::placeholder{color:var(--text-3)}
+.field:focus{border-color:color-mix(in srgb,var(--serif) 45%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--serif) 12%,transparent)}
+@media (pointer:coarse){.field,.field-select{font-size:16px}}
+.field-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%2371717a' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .8rem center;padding-right:2rem;cursor:pointer;height:40px}
+.hash-row{display:flex;gap:.5rem;width:100%}
+.hash-row .field{flex:1;min-width:0}
+.hash-row .btn{height:40px;flex-shrink:0}
+
+/* ---------- buttons (PillButton line) ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.375rem;height:40px;padding:0 .95rem;border-radius:10px;font-size:13.5px;font-weight:500;line-height:1;letter-spacing:-.005em;transition:background-color .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease),transform .2s var(--ease),box-shadow .2s var(--ease);user-select:none;white-space:nowrap}
+.btn:active{transform:translateY(0) scale(.97);transition-duration:.12s}
+.btn:focus-visible{outline:2px solid var(--serif);outline-offset:2px}
+.btn-primary{background:var(--btn-solid);color:var(--btn-solid-text)}
+.btn-secondary{background:var(--btn-ghost-bg);color:var(--btn-ghost-text);border:1px solid var(--border)}
+
+/* ---------- segmented toggles — sliding pill ---------- */
+.seg{position:relative;display:inline-flex;align-items:center;gap:2px;height:40px;padding:4px;border-radius:11px;border:1px solid var(--border);background:var(--surface)}
+.seg-thumb{position:absolute;top:4px;bottom:4px;left:4px;width:calc(100% - 8px);border-radius:8px;background:var(--surface-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);transform-origin:0 50%;transition:transform .28s var(--ease);pointer-events:none}
+.seg-btn{position:relative;z-index:1;height:30px;padding:0 .95rem;border-radius:8px;font-size:13px;font-weight:500;color:var(--text-3);transition:color .18s var(--ease)}
+.seg-btn.active{color:var(--text)}
+.seg-btn:active{color:var(--text-2)}
+
+/* ---------- colors ---------- */
+.controls-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
+.colors{display:flex;flex-wrap:wrap;gap:.5rem}
+.color-chip{display:inline-flex;align-items:center;gap:.5rem;height:36px;padding:0 .75rem;border-radius:10px;border:1px solid var(--border);background:var(--surface)}
+.color-chip .copyable{display:inline-flex;align-items:center}
+.color-dot{width:16px;height:16px;border-radius:5px;flex-shrink:0}
+.color-hex{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--text)}
+.copyable{cursor:pointer;border-radius:4px;padding:2px 4px;transition:background-color .15s,color .15s}
+.text-copied{color:var(--accent)}
+.export{display:flex;align-items:center;gap:.5rem}
+.export .field-select{width:auto;min-width:110px}
+
+/* ---------- samples ---------- */
+.samples-row{display:flex;flex-wrap:wrap;justify-content:center;gap:1.25rem 1.75rem}
+.sample-btn{display:flex;flex-direction:column;align-items:center;gap:.45rem;transition:opacity .18s var(--ease)}
+.sample-btn:active{opacity:.7}
+.sample-frame{width:56px;height:56px;overflow:hidden;border-radius:9999px}
+.sample-frame.shape-squircle{border-radius:0;clip-path:inset(0 round 28%)}
+.sample-frame.shape-square{border-radius:0}
+.sample-frame canvas{display:block;width:100%;height:100%}
+.sample-label{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--text-3);max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ---------- footer ---------- */
+.site-footer{padding:1.75rem 0 .25rem;text-align:center;font-size:12px;color:var(--text-3)}
+.footer-line{line-height:1.7}
+.footer-link{color:var(--text-2);text-decoration:underline;text-underline-offset:2px}
+
+/* ---------- hover — fine pointers only ---------- */
+@media (hover:hover) and (pointer:fine){
+  .icon-link:hover{color:var(--text);background:var(--surface)}
+  .field:hover{border-color:var(--border-2)}
+  .btn:hover{transform:translateY(-1px)}
+  .btn-primary:hover{background:var(--btn-solid-hover);box-shadow:var(--btn-solid-hover-shadow)}
+  .btn-secondary:hover{background:var(--btn-ghost-hover-bg);color:var(--btn-ghost-hover-text);border-color:var(--btn-ghost-hover-border);box-shadow:var(--btn-ghost-hover-shadow)}
+  .seg-btn:hover{color:var(--text-2)}
+  .copyable:hover{background:var(--surface-2)}
+  .sample-btn:hover{opacity:.85}
+  .footer-link:hover{color:var(--text)}
+}
+
+/* ---------- theme toggle ---------- */
+.theme-icon{display:none}
+html[data-theme="dark"] .icon-sun{display:block}
+html[data-theme="light"] .icon-moon{display:block}
+html:not([data-theme]) .icon-sun{display:block}
+
+/* ---------- entrance ---------- */
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.avatar-wrap,.display,.tagline,.playground{animation:rise .45s var(--ease) both}
+.display{animation-delay:.06s}
+.tagline{animation-delay:.12s}
+.playground{animation-delay:.18s}
+.controls-grid .field-group{animation:rise .4s var(--ease) both}
+.controls-grid .field-group:nth-child(1){animation-delay:.22s}
+.controls-grid .field-group:nth-child(2){animation-delay:.26s}
+.controls-grid .field-group:nth-child(3){animation-delay:.3s}
+.controls-grid .field-group:nth-child(4){animation-delay:.34s}
+.controls-grid .field-group:nth-child(5){animation-delay:.38s}
+.controls-row{animation:rise .4s var(--ease) .42s both}
+.samples-row{animation:rise .4s var(--ease) .46s both}
+@media (prefers-reduced-motion:reduce){
+  .avatar-wrap,.display,.tagline,.playground,.controls-grid .field-group,.controls-row,.samples-row{animation:fade .2s ease both}
+  .seg-thumb{transition:none}
+}
+
+/* ---------- short viewports (laptops) ---------- */
+@media (max-height: 860px){
+  .topbar{padding-bottom:.75rem}
+  .stage{padding-top:0}
+  .avatar-frame{width:min(200px,56vw)}
+  .display{font-size:40px;line-height:40px;margin-top:1rem}
+  .tagline{margin-top:.35rem;font-size:14px;line-height:20px}
+  .playground{margin-top:1.35rem;gap:1.25rem}
+  .controls-grid{gap:1rem 1.75rem}
+  .field-group{gap:.4rem}
+  .field,.seg,.btn-shuffle,.export .btn{height:36px}
+  .seg{height:36px}
+  .seg-btn{height:28px}
+  .seg-thumb{top:4px;bottom:4px}
+  .sample-frame{width:46px;height:46px}
+  .sample-btn{gap:.35rem}
+  .site-footer{padding-top:1.25rem}
+}
+
+/* ---------- mobile ---------- */
+@media (max-width:560px){
+  .stage{padding-top:.5rem}
+  .avatar-frame{width:min(250px,70vw)}
+  .controls-grid{gap:1.25rem;width:100%}
+  .field-group{width:100%}
+  .field-group:not(.field-grow){align-items:stretch;text-align:left}
+  .seg{width:100%}
+  .seg-btn{flex:1;padding:0 .5rem}
+  .field-grow{max-width:none}
+  .controls-row{flex-direction:column;align-items:stretch;gap:.9rem}
+  .colors{justify-content:center}
+  .export{width:100%}
+  .export .field-select{flex:1}
+  .export .btn{flex:1}
+  .samples-row{gap:1rem 1.25rem}
+}
