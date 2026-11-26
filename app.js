@@ -313,5 +313,56 @@ document.querySelectorAll('.sample-btn').forEach((btn) => {
   });
 })();
 
+/* ---------- icon tooltips ---------- */
+(function initLinkTips() {
+  const nav = document.querySelector('.toplinks');
+  if (!nav) return;
+
+  const tips = {
+    npm: nav.querySelector('[data-stat="npm"]'),
+    github: nav.querySelector('[data-stat="github"]'),
+  };
+  const compact = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 });
+
+  let warm = null;
+  let cool = null;
+  nav.addEventListener('mouseover', () => {
+    clearTimeout(cool);
+    cool = null;
+    if (nav.dataset.instant || warm) return;
+    warm = setTimeout(() => {
+      nav.dataset.instant = 'true';
+      warm = null;
+    }, 260);
+  });
+  nav.addEventListener('mouseleave', () => {
+    clearTimeout(warm);
+    warm = null;
+    cool = setTimeout(() => {
+      delete nav.dataset.instant;
+      cool = null;
+    }, 260);
+  });
+
+  const request = (url) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
+    return fetch(url, { signal: controller.signal, headers: { Accept: 'application/json' } })
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
+      .finally(() => clearTimeout(timer));
+  };
+  const show = (el, text) => {
+    if (el) el.textContent = text;
+  };
+
+  request('https://api.npmjs.org/downloads/point/last-week/dithervatar')
+    .then((data) => show(tips.npm, `${compact.format(data.downloads)} downloads this week`))
+    .catch(() => show(tips.npm, 'npm package'));
+
+  request('https://api.github.com/repos/kirianL/Dithervatar')
+    .then((data) => show(tips.github, `${compact.format(data.stargazers_count)} stars`))
+    .catch(() => show(tips.github, 'GitHub repository'));
+})();
+
 renderAll();
 layoutThumbs();
