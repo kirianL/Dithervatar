@@ -356,8 +356,8 @@ document.querySelectorAll('.sample-btn').forEach((btn) => {
   };
 
   request('https://api.npmjs.org/downloads/point/last-week/dithervatar')
-    .then((data) => show(tips.npm, `${compact.format(data.downloads)} downloads this week`))
-    .catch(() => show(tips.npm, 'npm package'));
+    .then((data) => show(tips.npm, `${compact.format(data.downloads)} downloads`))
+    .catch(() => show(tips.npm, '0 downloads'));
 
   request('https://api.github.com/repos/kirianL/Dithervatar')
     .then((data) => show(tips.github, `${compact.format(data.stargazers_count)} stars`))
