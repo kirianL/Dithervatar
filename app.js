@@ -5,6 +5,7 @@ import {
   renderHashvatar,
 } from './vendor/hashvatar.js';
 import { hasWebGL2, renderDitherGL } from './vendor/dither-gl.js';
+import { slotText } from './vendor/slot-text/index.js';
 
 const state = {
   mode: 'dither',
@@ -14,7 +15,6 @@ const state = {
   toneInput: '',
   hashInput: 'zeus',
   exportSize: 1024,
-  copiedId: null,
 };
 
 /* ---------- logo scramble ---------- */
@@ -197,48 +197,50 @@ function currentColors() {
 }
 
 function copyText(text) {
-  if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text);
+  if (!navigator.clipboard?.writeText) return Promise.resolve(false);
+  return navigator.clipboard.writeText(text).then(() => true, () => false);
 }
+
+const colorLabels = [];
 
 function renderColors() {
   const wrap = $('#color-grid');
   const colors = currentColors();
+  colorLabels.forEach((label) => label.destroy());
+  colorLabels.length = 0;
   wrap.innerHTML = '';
-  colors.forEach((color, i) => {
+  colors.forEach((color) => {
     const hex = oklchToHex(color);
     const chip = document.createElement('div');
     chip.className = 'color-chip';
     const span = document.createElement('span');
     span.className = 'copyable color-hex';
-    span.dataset.vid = `hex-${i}`;
     span.dataset.raw = hex;
     span.title = 'Click to copy';
-    span.textContent = hex;
-    if (state.copiedId === span.dataset.vid) {
-      const inner = document.createElement('span');
-      inner.className = 'text-copied';
-      inner.textContent = 'copied';
-      span.textContent = '';
-      span.appendChild(inner);
-    }
-    span.addEventListener('click', () => {
-      copyText(hex);
-      state.copiedId = span.dataset.vid;
-      renderColors();
-      setTimeout(() => {
-        if (state.copiedId === span.dataset.vid) {
-          state.copiedId = null;
-          renderColors();
-        }
-      }, 600);
-    });
     chip.innerHTML = `<span class="color-dot" style="background:${hex}"></span>`;
     chip.appendChild(span);
     wrap.appendChild(chip);
+    const label = slotText(span, hex, { stagger: 18, duration: 220 });
+    colorLabels.push(label);
+    span.addEventListener('click', () => {
+      copyText(hex).then((ok) => {
+        if (!ok) {
+          label.flash('failed', { revertAfter: 900, enter: { direction: 'up' } });
+          return;
+        }
+        label.flash('copied', {
+          revertAfter: 900,
+          enter: { direction: 'up', color: 'var(--accent)' },
+          exit: { direction: 'down' },
+        });
+      });
+    });
   });
 }
 
 /* ---------- export ---------- */
+const downloadLabel = slotText($('#btn-download'), 'Download PNG', { stagger: 22, duration: 260 });
+
 $('#btn-download').addEventListener('click', () => {
   const size = state.exportSize;
   const src = previewSlot.canvas;
@@ -274,6 +276,7 @@ $('#btn-download').addEventListener('click', () => {
   a.download = 'dithervatar.png';
   a.href = canvas.toDataURL('image/png');
   a.click();
+  downloadLabel.flash('Saved', { revertAfter: 1200, enter: { direction: 'up' } });
 });
 
 $('#export-size').addEventListener('change', (e) => { state.exportSize = Number(e.target.value); });
