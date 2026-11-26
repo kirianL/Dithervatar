@@ -239,7 +239,13 @@ function renderColors() {
 }
 
 /* ---------- export ---------- */
-const downloadLabel = slotText($('#btn-download'), 'Download PNG', { stagger: 22, duration: 260 });
+const downloadLabel = slotText($('#download-label'), 'Download PNG', { stagger: 22, duration: 260 });
+const downloadButton = $('#btn-download');
+const lockDownloadWidth = () => {
+  downloadButton.style.minWidth = `${Math.ceil(downloadButton.getBoundingClientRect().width)}px`;
+};
+lockDownloadWidth();
+if (document.fonts?.ready) document.fonts.ready.then(lockDownloadWidth);
 
 $('#btn-download').addEventListener('click', () => {
   const size = state.exportSize;
@@ -373,22 +379,15 @@ document.querySelectorAll('.sample-btn').forEach((btn) => {
   if (!triggers.length) return;
 
   const status = document.getElementById('copy-status');
-  const idle = new Map(
-    triggers.map((el) => [el, el.querySelector('.icon-tip')?.textContent ?? el.textContent])
-  );
-  const pending = new Map();
+  const labels = new Map();
   let doc = null;
 
-  const setText = (el, text) => {
-    const tip = el.querySelector('.icon-tip');
-    if (tip) tip.textContent = text;
-    else el.textContent = text;
-  };
   const announce = (message) => {
     if (status) status.textContent = message;
   };
 
   const copy = async (el) => {
+    const label = labels.get(el);
     try {
       if (!doc) {
         const res = await fetch('llms.txt', { cache: 'no-cache' });
@@ -397,22 +396,26 @@ document.querySelectorAll('.sample-btn').forEach((btn) => {
       }
       if (!navigator.clipboard?.writeText) throw new Error('clipboard unavailable');
       await navigator.clipboard.writeText(doc);
-      el.dataset.copied = 'true';
-      setText(el, 'Copied');
+      label.flash('Copied', {
+        revertAfter: 1600,
+        enter: { direction: 'up', color: 'var(--accent)' },
+        exit: { direction: 'down' },
+      });
       announce('llms.txt copied. Paste it into your agent before it touches avatar code.');
     } catch {
-      setText(el, 'Copy failed');
+      label.flash('Copy failed', {
+        revertAfter: 1600,
+        enter: { direction: 'up' },
+      });
       announce('Could not copy llms.txt.');
     }
-    clearTimeout(pending.get(el));
-    pending.set(el, setTimeout(() => {
-      delete el.dataset.copied;
-      setText(el, idle.get(el));
-      pending.delete(el);
-    }, 1600));
   };
 
-  triggers.forEach((el) => el.addEventListener('click', () => copy(el)));
+  triggers.forEach((el) => {
+    const target = el.querySelector('.icon-tip, .copy-label') ?? el;
+    labels.set(el, slotText(target, target.textContent.trim(), { stagger: 16, duration: 220 }));
+    el.addEventListener('click', () => copy(el));
+  });
 })();
 
 renderAll();
