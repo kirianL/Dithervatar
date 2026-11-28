@@ -48,7 +48,7 @@ svg{display:block}
 button,a,[role="button"],input[type="checkbox"],select,.field,.bio-pencil-word{touch-action:manipulation}
 .seg-btn,.sample-btn,.icon-link,.copyable,.bio-pencil-word{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 
-.page{max-width:720px;margin:0 auto;padding:1.25rem max(1.5rem,env(safe-area-inset-right)) calc(1.5rem + env(safe-area-inset-bottom)) max(1.5rem,env(safe-area-inset-left));display:flex;flex-direction:column;min-height:100dvh}
+.page{max-width:720px;margin:0 auto;padding:1.25rem max(1.5rem,env(safe-area-inset-right)) calc(1.5rem + env(safe-area-inset-bottom)) max(1.5rem,env(safe-area-inset-left));display:flex;flex-direction:column;min-height:100dvh;overflow-x:clip}
 
 /* ---------- topbar ---------- */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.25rem 0 1.5rem}
@@ -109,7 +109,6 @@ button,a,[role="button"],input[type="checkbox"],select,.field,.bio-pencil-word{t
 .color-dot{width:16px;height:16px;border-radius:5px;flex-shrink:0}
 .color-hex{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--text)}
 .copyable{cursor:pointer;border-radius:4px;padding:2px 4px;transition:background-color .15s,color .15s}
-.seg-compact .seg-btn{padding:0 .7rem;font-size:12.5px}
 .field-note{margin-top:.45rem;font-family:"IBM Plex Mono",monospace;font-size:10.5px;line-height:1.5;color:var(--text-3);max-width:30ch}
 .export{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
 .export .field-select{width:auto;min-width:110px}
@@ -222,7 +221,6 @@ html:not([data-theme]) .icon-sun{display:block}
   .controls-row{flex-direction:column;align-items:stretch;gap:.9rem}
   .colors{justify-content:center}
   .export{width:100%}
-  .export .seg{flex:1 1 100%}
   .export .field-select{flex:1}
   .export .btn{flex:1}
   .samples-row{gap:1rem 1.25rem}

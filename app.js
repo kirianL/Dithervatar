@@ -215,7 +215,7 @@ function syncUrlHash() {
 }
 
 function renderPreview() {
-  const hash = state.hashInput || 'default';
+  const hash = state.hashInput || 'zeus';
   const previewSize = Math.max(64, Math.round(avatarFrame.clientWidth || 280));
   if (previewCancel) { previewCancel(); previewCancel = null; }
   previewCancel = renderAvatar(previewSlot, hash, previewSize, state) || null;
@@ -361,45 +361,26 @@ function renderExportPngCanvas(hash, size) {
 }
 
 $('#btn-copy').addEventListener('click', async () => {
-  const hash = state.hashInput || 'default';
+  const hash = state.hashInput || 'zeus';
   const canvas = renderExportPngCanvas(hash, Math.min(256, state.exportSize));
-  if (canvas && await copyText(canvas.toDataURL('image/png'))) {
-    copyLabel.flash('Copied', { revertAfter: 1200, enter: { direction: 'up' } });
+  if (!canvas) return;
+  let ok = false;
+  if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+    try {
+      const blob = await new Promise((res) => canvas.toBlob(res, 'image/png'));
+      if (blob) {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        ok = true;
+      }
+    } catch {}
   }
+  if (!ok) ok = await copyText(canvas.toDataURL('image/png'));
+  if (ok) copyLabel.flash('Copied', { revertAfter: 1200, enter: { direction: 'up' } });
 });
 
 $('#btn-download').addEventListener('click', () => {
-  const size = state.exportSize;
-  const hash = state.hashInput || 'default';
-  const src = staticFrame(hash, size);
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  ctx.drawImage(src, 0, 0, src.width, src.height, 0, 0, size, size);
-  ctx.globalCompositeOperation = 'destination-in';
-  if (state.shape === 'circle') {
-    ctx.beginPath();
-    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
-    ctx.fill();
-  } else if (state.shape === 'squircle') {
-    const r = 0.28 * size;
-    if (typeof ctx.roundRect === 'function') {
-      ctx.beginPath();
-      ctx.roundRect(0, 0, size, size, r);
-      ctx.fill();
-    } else {
-      ctx.beginPath();
-      ctx.moveTo(r, 0); ctx.lineTo(size - r, 0); ctx.arcTo(size, 0, size, r, r);
-      ctx.lineTo(size, size - r); ctx.arcTo(size, size, size - r, size, r);
-      ctx.lineTo(r, size); ctx.arcTo(0, size, 0, size - r, r);
-      ctx.lineTo(0, r); ctx.arcTo(0, 0, r, 0, r);
-      ctx.fill();
-    }
-  } else {
-    ctx.fillRect(0, 0, size, size);
-  }
+  const canvas = renderExportPngCanvas(state.hashInput || 'zeus', state.exportSize);
+  if (!canvas) return;
   const a = document.createElement('a');
   a.download = 'dithervatar.png';
   a.href = canvas.toDataURL('image/png');

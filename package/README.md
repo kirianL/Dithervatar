@@ -67,10 +67,6 @@ import { hashToColors, hashToSeeds, oklchToHex, oklchToCss, parseTone, hasWebGL2
 - `renderDithervatar` returns a cancel function — call it on unmount or when the hash changes.
 - If the canvas already has a 2D context, pass a fresh `<canvas>` element (a canvas can only hold one context type).
 
-## Credits
-
-Hash-seeding, oklch color generation and the 2D dither fallback are adapted from [dithervatar](https://github.com/medhychabour/dithervatar) (MIT). The WebGL2 Bayer halftone renderer is original, ported from the Portfolio-Kirian banner.
-
 ## License
 
 MIT © Kirian Luna
