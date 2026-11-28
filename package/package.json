@@ -1,6 +1,6 @@
 {
   "name": "dithervatar",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Deterministic dithered avatars from any string. WebGL2 Bayer halftone renderer, automatic 2D fallback, zero dependencies.",
   "type": "module",
   "main": "./src/index.js",
