@@ -68,6 +68,23 @@ export function Avatar({ hash, size = 64 }) {
 - The canvas is square and transparent-friendly. Clip with `border-radius` for circles or squircles.
 - Keep the hash stable. Changing it changes the avatar.
 
+## Web Component
+
+```html
+<script type="module" src="https://esm.sh/dithervatar/element"></script>
+<dither-avatar hash="zeus" size="64" shape="squircle"></dither-avatar>
+```
+
+`shape` (`circle`, `squircle`, `square`) applies `border-radius` to the canvas; it does not clip the underlying pixels.
+
+## CLI
+
+```bash
+npx dithervatar zeus --size 256 --grid 64 --shape circle --out avatar.svg
+```
+
+Emits a two-tone SVG to `--out` or `stdout` (SVG only, no PNG).
+
 ## Other exports
 
-`hashToColors`, `hashToSeeds`, `oklchToHex`, `oklchToCss`, `parseTone`, `hasWebGL2`, `renderDitherGL`, `renderDithervatarTo`.
+`avatarToSvg`, `hashToColors`, `hashToSeeds`, `oklchToHex`, `oklchToCss`, `parseTone`, `hasWebGL2`, `renderDitherGL`, `renderDithervatarTo`.

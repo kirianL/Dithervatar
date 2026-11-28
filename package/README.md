@@ -69,7 +69,7 @@ import { hashToColors, hashToSeeds, oklchToHex, oklchToCss, parseTone, hasWebGL2
 
 ## Credits
 
-Hash-seeding, oklch color generation and the 2D dither fallback are adapted from [hashvatar](https://github.com/medhychabour/hashvatar) (MIT). The WebGL2 Bayer halftone renderer is original, ported from the Portfolio-Kirian banner.
+Hash-seeding, oklch color generation and the 2D dither fallback are adapted from [dithervatar](https://github.com/medhychabour/dithervatar) (MIT). The WebGL2 Bayer halftone renderer is original, ported from the Portfolio-Kirian banner.
 
 ## License
 

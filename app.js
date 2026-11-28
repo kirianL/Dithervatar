@@ -1,11 +1,10 @@
 import { CR_MAP_COUNTRIES } from './cr-map.js';
-import { avatarToSvg } from './vendor/svg.js';
 import {
   hashToColors,
   hashToSeeds,
   oklchToHex,
-  renderHashvatar,
-} from './vendor/hashvatar.js';
+  renderDithervatarTo,
+} from './vendor/core.js';
 import { hasWebGL2, renderDitherGL } from './vendor/dither-gl.js';
 import { slotText } from './vendor/slot-text/index.js';
 
@@ -153,7 +152,7 @@ function renderAvatar(slot, hash, size, st) {
     if (cancel !== false) return typeof cancel === 'function' ? cancel : () => {};
   }
   const canvas = canvasFor(slot, '2d');
-  return renderHashvatar(canvas, {
+  return renderDithervatarTo(canvas, {
     hash,
     size,
     mode: st.mode,
@@ -163,26 +162,88 @@ function renderAvatar(slot, hash, size, st) {
 }
 
 let resizeTimer = null;
-function renderAll() {
+let hashSyncTimer = null;
+
+function readUrlHash() {
+  const raw = location.hash.replace(/^#/, '');
+  if (!raw) {
+    state.hashInput = 'zeus';
+    hashInput.value = 'zeus';
+    state.shape = 'circle';
+    state.exportSize = 1024;
+    $('#group-shape')?.querySelectorAll('.seg-btn').forEach((b) => b.classList.toggle('active', b.dataset.value === 'circle'));
+    const sel = $('#export-size');
+    if (sel) sel.value = '1024';
+    return;
+  }
+  let parts;
+  try {
+    parts = raw.split('/').map(decodeURIComponent);
+  } catch {
+    return;
+  }
+  const [seed, second, third] = parts;
+  if (seed) {
+    state.hashInput = seed;
+    hashInput.value = seed;
+  }
+  const shapeArg = (second === 'circle' || second === 'squircle' || second === 'square') ? second : null;
+  if (shapeArg) {
+    state.shape = shapeArg;
+    $('#group-shape')?.querySelectorAll('.seg-btn').forEach((b) => b.classList.toggle('active', b.dataset.value === shapeArg));
+  }
+  const sizeNum = Number(shapeArg ? third : second);
+  if ([32, 64, 128, 256, 512, 1024].includes(sizeNum)) {
+    state.exportSize = sizeNum;
+    const sel = $('#export-size');
+    if (sel) sel.value = String(sizeNum);
+  }
+}
+
+function syncUrlHash() {
+  clearTimeout(hashSyncTimer);
+  hashSyncTimer = setTimeout(() => {
+    const seed = encodeURIComponent(state.hashInput || 'zeus');
+    const parts = [seed];
+    if (state.shape !== 'circle' || state.exportSize !== 1024) parts.push(state.shape);
+    if (state.exportSize !== 1024) parts.push(String(state.exportSize));
+    const next = parts.length === 1 && seed === 'zeus' ? location.pathname + location.search : `#${parts.join('/')}`;
+    if (location.hash !== (next.startsWith('#') ? next : '')) {
+      history.replaceState(null, '', next);
+    }
+  }, 250);
+}
+
+function renderPreview() {
   const hash = state.hashInput || 'default';
   const previewSize = Math.max(64, Math.round(avatarFrame.clientWidth || 280));
-
   if (previewCancel) { previewCancel(); previewCancel = null; }
   previewCancel = renderAvatar(previewSlot, hash, previewSize, state) || null;
+  avatarFrame.className = 'avatar-frame ' + shapeClass(state.shape);
+  renderColors();
+  syncUrlHash();
+}
 
+function renderSamples() {
+  const shape = shapeClass(state.shape);
   sampleSlots.forEach((slot, i) => {
     sampleCancels.get(i)?.();
     sampleCancels.set(i, renderAvatar(slot, slot.btn.dataset.value, SAMPLE_SIZE, state) || null);
-  });
-
-  avatarFrame.className = 'avatar-frame ' + shapeClass(state.shape);
-  const shape = shapeClass(state.shape);
-  sampleSlots.forEach((slot) => {
     slot.frame.className = 'sample-frame' + (shape ? ' ' + shape : '');
   });
-
-  renderColors();
 }
+
+function renderAll() {
+  renderPreview();
+  renderSamples();
+}
+
+readUrlHash();
+window.addEventListener('hashchange', () => {
+  readUrlHash();
+  layoutThumbs();
+  renderAll();
+});
 
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
@@ -247,19 +308,16 @@ function staticFrame(hash, size) {
   return exportSlot.canvas;
 }
 
+const copyLabel = slotText($('#copy-label'), 'Copy PNG', { stagger: 22, duration: 260 });
+const copyButton = $('#btn-copy');
 const downloadLabel = slotText($('#download-label'), 'Download PNG', { stagger: 22, duration: 260 });
 const downloadButton = $('#btn-download');
-const lockDownloadWidth = () => {
+const lockExportWidths = () => {
+  if (copyButton) copyButton.style.minWidth = `${Math.ceil(copyButton.getBoundingClientRect().width)}px`;
   downloadButton.style.minWidth = `${Math.ceil(downloadButton.getBoundingClientRect().width)}px`;
 };
-lockDownloadWidth();
-if (document.fonts?.ready) document.fonts.ready.then(lockDownloadWidth);
-
-state.format = 'png';
-bindToggleGroup($('#group-format'), (v) => {
-  state.format = v;
-  downloadLabel.set(v === 'svg' ? 'Download SVG' : 'Download PNG');
-}, () => {});
+lockExportWidths();
+if (document.fonts?.ready) document.fonts.ready.then(lockExportWidths);
 
 const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 const motionNote = $('#motion-note');
@@ -269,27 +327,50 @@ function syncMotionNote() {
 motionQuery.addEventListener?.('change', () => { syncMotionNote(); renderAll(); });
 syncMotionNote();
 
+function renderExportPngCanvas(hash, size) {
+  const src = staticFrame(hash, size);
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+  ctx.drawImage(src, 0, 0, src.width, src.height, 0, 0, size, size);
+  ctx.globalCompositeOperation = 'destination-in';
+  if (state.shape === 'circle') {
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (state.shape === 'squircle') {
+    const r = 0.28 * size;
+    if (typeof ctx.roundRect === 'function') {
+      ctx.beginPath();
+      ctx.roundRect(0, 0, size, size, r);
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(r, 0); ctx.lineTo(size - r, 0); ctx.arcTo(size, 0, size, r, r);
+      ctx.lineTo(size, size - r); ctx.arcTo(size, size, size - r, size, r);
+      ctx.lineTo(r, size); ctx.arcTo(0, size, 0, size - r, r);
+      ctx.lineTo(0, r); ctx.arcTo(0, 0, r, 0, r);
+      ctx.fill();
+    }
+  } else {
+    ctx.fillRect(0, 0, size, size);
+  }
+  return canvas;
+}
+
+$('#btn-copy').addEventListener('click', async () => {
+  const hash = state.hashInput || 'default';
+  const canvas = renderExportPngCanvas(hash, Math.min(256, state.exportSize));
+  if (canvas && await copyText(canvas.toDataURL('image/png'))) {
+    copyLabel.flash('Copied', { revertAfter: 1200, enter: { direction: 'up' } });
+  }
+});
+
 $('#btn-download').addEventListener('click', () => {
   const size = state.exportSize;
   const hash = state.hashInput || 'default';
-  if (state.format === 'svg') {
-    const svg = avatarToSvg(staticFrame(hash, Math.max(512, size)), {
-      hash,
-      tones: state.tones.length ? state.tones : undefined,
-      size,
-      shape: state.shape,
-      grid: 64,
-    });
-    if (!svg) return;
-    const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
-    const a = document.createElement('a');
-    a.download = 'dithervatar.svg';
-    a.href = url;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 0);
-    downloadLabel.flash('Saved', { revertAfter: 1200, enter: { direction: 'up' } });
-    return;
-  }
   const src = staticFrame(hash, size);
   const canvas = document.createElement('canvas');
   canvas.width = size;
@@ -326,7 +407,7 @@ $('#btn-download').addEventListener('click', () => {
   downloadLabel.flash('Saved', { revertAfter: 1200, enter: { direction: 'up' } });
 });
 
-$('#export-size').addEventListener('change', (e) => { state.exportSize = Number(e.target.value); });
+$('#export-size').addEventListener('change', (e) => { state.exportSize = Number(e.target.value); syncUrlHash(); });
 
 /* ---------- samples ---------- */
 document.querySelectorAll('.sample-btn').forEach((btn) => {

@@ -1,8 +1,8 @@
 // Dither renderer for Dithervatar — ports the WebGL2 fbm + Bayer 4x4 halftone
 // pipeline from the Portfolio-Kirian banner (RedDitherBanner) and adapts it to
 // deterministic, hash-seeded square avatars.
-// Signature matches renderDither() from vendor/hashvatar.js.
-import { oklchToHex } from './hashvatar.js';
+// Signature matches renderDither() from vendor/dithervatar.js.
+import { oklchToHex } from './core.js';
 
 const VS = `#version 300 es
 in vec2 aPosition;
@@ -176,7 +176,7 @@ function setupGL(canvas) {
   return ctx;
 }
 
-// Same contract as renderDither() in hashvatar.js:
+// Same contract as renderDither() in dithervatar.js:
 //   renderDitherGL(canvas, { size, colors, animated, seeds }) -> cancelFn | null | false
 // colors: array of oklch objects (2 entries for dither mode).
 // seeds: 4 hash-derived seeds in [0,1) — seed the fbm domain offset.

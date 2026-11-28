@@ -440,7 +440,7 @@ function hashToColors(hash, tones, count = 2) {
     (_, i) => generateColor(seeds[i * 3], seeds[i * 3 + 1], seeds[i * 3 + 2], toneList, i > 0, baseHue)
   );
 }
-function createHashvatar(options) {
+function createDithervatar(options) {
   const {
     hash,
     size = 64,
@@ -465,7 +465,7 @@ function createHashvatar(options) {
     destroy: () => cancel?.()
   };
 }
-function renderHashvatar(canvas, options) {
+function renderDithervatarTo(canvas, options) {
   const {
     hash,
     size = 64,
@@ -486,7 +486,7 @@ function renderHashvatar(canvas, options) {
   return () => cancel?.();
 }
 export {
-  createHashvatar,
+  createDithervatar,
   hashToColors,
   hashToSeeds,
   oklchToCss,
@@ -494,5 +494,5 @@ export {
   parseTone,
   renderDither,
   renderGradient,
-  renderHashvatar
+  renderDithervatarTo
 };

@@ -1,5 +1,5 @@
 // Synced with package/src/svg.js
-import { hashToColors, oklchToHex } from './hashvatar.js';
+import { hashToColors, oklchToHex } from './core.js';
 
 function hexToRgb(hex) {
   const n = parseInt(hex.replace('#', ''), 16);
